@@ -21,7 +21,10 @@ void mostrarTareasRealizadasPendientes(Nodo **tareasPendientes, Nodo **tareasRea
 Nodo* quitarNodo(Nodo** cabecera);
 void insertarNodo(Nodo **cabecera, Nodo* nodo);
 void filtrarTareasSegunID(Nodo **cabecera, Nodo **cabecera1);
+int buscarPalabraClave(Nodo *cabecera, char palabra[]);
+int buscarPorID(Nodo *cabecera, int ID);
 
+void indicarTareaSegunPalabraClaveOID(Nodo *cabecera, Nodo *cabecera2);
 
 //Cuando vea un puntero tengo que ver en asignarle memoria dinámica!!!!!!!!!!!
 
@@ -89,7 +92,7 @@ int main()
                 mostrarTareasRealizadasPendientes(&tareasPendientes, &tareasRealizadas);
                 break;
             case 3:
-                indicarTareaSegunPalabraClaveOID(tareasPendientes, tareasRealizadas);
+                indicarTareaSegunPalabraClaveOID(tareasRealizadas, tareasPendientes);
                 break;
             default:
                 break;
@@ -171,61 +174,61 @@ void filtrarTareasSegunID(Nodo **cabecera, Nodo **cabecera1)
 void indicarTareaSegunPalabraClaveOID(Nodo *cabecera, Nodo *cabecera2)
 {
     char palabra[100];
-    int opcion, ID;
+    int opcion, ID, resultadoListaPendientes, resultadoListaRealizadas;
     printf("Ingrese 1 si quere buscar una tarea por ID, o 2 si quiere buscar una tarea por palabra clave: ");
+    scanf("%d", &opcion);
+    fflush(stdin);
     switch(opcion)
     {
     case(1):
+        printf("ID:");
         scanf("%d", &ID);
-        while (cabecera)
-        {
-            while (cabecera2)
-            {
-                if(cabecera2->T.TareaID == ID)
-                {
-                    printf("La tarea ingresada se encuentra en la lista de tareas realizadas");
-                    cabecera2 = cabecera2->Siguiente;
-                    break;
-                }
-            }
-            if (cabecera->T.TareaID == ID)
-            {
-                printf("La tarea ingresada se encuentra en la lista de tareas pendientes");
-                break;
-            }
-            cabecera = cabecera->Siguiente;
-        }
-        if (cabecera == NULL && cabecera2 == NULL)
-        {
-            printf("No se encontro la tarea");
-        }
+        resultadoListaRealizadas = buscarPorID(cabecera, ID);
+        resultadoListaPendientes = buscarPorID(cabecera2, ID);
         break;
     case(2):
         gets(palabra);
-        while (cabecera)
-        {
-            while (cabecera2)
-            {
-                if(strstr(cabecera2->T.Descripcion, palabra) != NULL)
-                {
-                    printf("La tarea ingresada se encuentra en la lista de tareas realizadas");
-                    cabecera2 = cabecera2->Siguiente;
-                    break;
-                }
-            }
-            if (strstr(cabecera2->T.Descripcion, palabra) != NULL)
-            {
-                printf("La tarea ingresada se encuentra en la lista de tareas pendientes");
-                break;
-            }
-            cabecera = cabecera->Siguiente;
-        }
-        if (cabecera == NULL && cabecera2 == NULL)
-        {
-            printf("No se encontro la tarea");
-        }
+        resultadoListaRealizadas = buscarPalabraClave(cabecera, palabra);
+        resultadoListaPendientes = buscarPalabraClave(cabecera2, palabra);
         break;
     default:
         break;
     }
+
+    if (resultadoListaRealizadas)
+    {
+        printf("La tarea se encontro en tareas realizadas\n");
+    }else if(resultadoListaPendientes)
+    {
+        printf("La tarea se encontro en tareas pendientes\n");
+    }else
+    {
+            printf("NO se encontro la tarea\n");
+    }
+}
+
+int buscarPalabraClave(Nodo *cabecera, char palabra[])
+{
+    while (cabecera)
+    {
+        if(strstr(cabecera->T.Descripcion, palabra) != NULL)
+        {
+            return 1;
+        }
+        cabecera = cabecera->Siguiente;
+    }
+    return 0;
+}
+
+int buscarPorID(Nodo *cabecera, int ID)
+{
+    while (cabecera)
+    {
+        if(cabecera->T.TareaID == ID)
+        {
+            return 1;
+        }
+        cabecera = cabecera->Siguiente;
+    }
+    return 0;
 }
